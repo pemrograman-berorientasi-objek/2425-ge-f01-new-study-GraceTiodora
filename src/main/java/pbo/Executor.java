@@ -10,6 +10,7 @@ public class Executor {
         this.entityManager = entityManager;
     }
 
+    // Membersihkan semua tabel
     public void cleanUpTables() {
         entityManager.getTransaction().begin();
         entityManager.createQuery("DELETE FROM Enrollment").executeUpdate();
@@ -18,19 +19,22 @@ public class Executor {
         entityManager.getTransaction().commit();
     }
 
+    // Tambah mahasiswa
     public void addStudent(String[] data) {
         entityManager.getTransaction().begin();
         String id = data[1];
         String name = data[2];
         String program = data[3];
 
-        if (entityManager.find(Student.class, id) == null) {
+        Student s = entityManager.find(Student.class, id);
+        if (s == null) {
             Student student = new Student(id, name, program);
             entityManager.persist(student);
         }
         entityManager.getTransaction().commit();
     }
 
+    // Tambah mata kuliah
     public void addCourse(String[] data) {
         entityManager.getTransaction().begin();
         String id = data[1];
@@ -38,13 +42,15 @@ public class Executor {
         int semester = Integer.parseInt(data[3]);
         int credit = Integer.parseInt(data[4]);
 
-        if (entityManager.find(Course.class, id) == null) {
+        Course c = entityManager.find(Course.class, id);
+        if (c == null) {
             Course course = new Course(id, name, semester, credit);
             entityManager.persist(course);
         }
         entityManager.getTransaction().commit();
     }
 
+    // Tambah enrollment
     public void enrollStudent(String[] data) {
         entityManager.getTransaction().begin();
         String studentId = data[1];
@@ -57,9 +63,11 @@ public class Executor {
             Enrollment enrollment = new Enrollment(student, course);
             entityManager.persist(enrollment);
         }
+
         entityManager.getTransaction().commit();
     }
 
+    // Tampilkan data mahasiswa dan enrollments-nya
     public void showStudent(String[] data) {
         String studentId = data[1];
         Student student = entityManager.find(Student.class, studentId);

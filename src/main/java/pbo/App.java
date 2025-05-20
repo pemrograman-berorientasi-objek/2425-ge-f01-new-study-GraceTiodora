@@ -2,14 +2,13 @@ package pbo;
 
 import java.util.*;
 import javax.persistence.*;
-import pbo.Executor;
 
 public class App {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        Map<String, Student> students = new HashMap<>();
-        Map<String, Course> courses = new HashMap<>();
-        Map<String, List<Course>> enrollments = new HashMap<>();
+        Map<String, Student> students = new LinkedHashMap<>(); // urutan input mahasiswa
+        Map<String, Course> courses = new LinkedHashMap<>();   // urutan input mata kuliah
+        Map<String, LinkedHashSet<Course>> enrollments = new LinkedHashMap<>(); // urutan input enroll per student + unik
 
         while (sc.hasNextLine()) {
             String[] parts = sc.nextLine().split("#");
@@ -31,20 +30,31 @@ public class App {
                 case "enroll": {
                     String sid = parts[1], cid = parts[2];
                     Course course = courses.get(cid);
-                    enrollments.computeIfAbsent(sid, k -> new ArrayList<>()).add(course);
+                    if(course != null){
+                        enrollments.computeIfAbsent(sid, k -> new LinkedHashSet<>()).add(course);
+                    }
                     break;
                 }
                 case "student-show": {
                     String sid = parts[1];
                     Student s = students.get(sid);
-                    System.out.println(s);
-                    enrollments.getOrDefault(sid, new ArrayList<>())
-                               .forEach(c -> System.out.println(c));
+                    if (s != null) {
+                        System.out.println(s);
+
+                        // Dapatkan daftar course yang di-enroll, urutkan berdasarkan courseId agar konsisten
+                        LinkedHashSet<Course> enrolledCourses = enrollments.getOrDefault(sid, new LinkedHashSet<>());
+
+                        List<Course> sortedCourses = new ArrayList<>(enrolledCourses);
+                        sortedCourses.sort(Comparator.comparing(Course::getCourseId));
+
+                        for (Course c : sortedCourses) {
+                            System.out.println(c);
+                        }
+                    }
                     break;
                 }
             }
         }
-
         sc.close();
     }
 }

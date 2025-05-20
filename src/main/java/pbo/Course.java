@@ -16,7 +16,6 @@ public class Course {
 
     @Column(name = "semester", nullable = false, length = 25)
     private int semester;
-    
     @Column(name = "credit", nullable = false, length = 25)
     private int credit;
   
